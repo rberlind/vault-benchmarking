@@ -13,15 +13,16 @@ function init(args)
    requests  = 0
    reads = 0
    writes = 0
+   deletes = 0
    responses = 0
-   method = "GET"
+   method = "DELETE"
    local msg = "thread %d created"
    print(msg:format(id))
 end
 
 function request()
-   reads = reads + 1
-   path = "/v1/secret/benchmark-" .. (reads % 50) + 1
+   deletes = deletes + 1
+   path = "/v1/secret/benchmark-" .. deletes
    body = ''
    requests = requests + 1
    return wrk.format(method, path, nil, body)
@@ -37,8 +38,9 @@ function done(summary, latency, requests)
       local requests  = thread:get("requests")
       local reads     = thread:get("reads")
       local writes    = thread:get("writes")
+      local deletes   = thread:get("deletes")
       local responses = thread:get("responses")
-      local msg = "thread %d made %d requests including %d reads and %d writes, and got %d responses"
-      print(msg:format(id, requests, reads, writes, responses))
+      local msg = "thread %d made %d requests including %d reads, %d writes, and % deletes, and got %d responses"
+      print(msg:format(id, requests, reads, writes, deletes, responses))
    end
 end

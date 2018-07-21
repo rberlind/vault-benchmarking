@@ -14,21 +14,23 @@ function init(args)
    reads = 0
    writes = 0
    responses = 0
-   path = "/v1/secret/benchmark-client-1-" .. id
+   -- give each thread different random seed
+   math.randomseed(os.time() + id*1000)
+   method = "POST"
    local msg = "thread %d created"
    print(msg:format(id))
 end
 
 function request()
-   if requests > -1 then
-      writes = writes + 1
-      method = "POST"
-      body = '{"foo-' .. id .. '" : "bar-' .. id ..'"}'
-   else
-      reads = reads + 1
-      method = "GET"
-      body = ''
-   end
+   writes = writes + 1
+   -- cycle through paths from 1 to N in order
+   -- path = "/v1/secret/benchmark-" .. (writes % 100) + 1
+   -- randomize path to secret
+   path = "/v1/secret/benchmark-" .. math.random(10000)
+   -- minimal secret giving thread id and # of write
+   -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
+   -- add extra key with 100 bytes
+   body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
