@@ -10,6 +10,7 @@ function setup(thread)
 end
 
 function init(args)
+   print_secrets = args[1]
    requests  = 0
    reads = 0
    writes = 0
@@ -17,8 +18,8 @@ function init(args)
    -- give each thread different random seed
    math.randomseed(os.time() + id*1000)
    method = "GET"
-   local msg = "thread %d created"
-   print(msg:format(id))
+   local msg = "thread %d created with print_secrets set to %s"
+   print(msg:format(id, print_secrets))
 end
 
 function request()
@@ -34,17 +35,17 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
-   --[[
-   body_object = json.decode(body)
-   for k,v in pairs(body_object) do 
-      if k == "data" then
-         for k1,v1 in pairs(v) do
-            local msg = "read secrets: %s : %s"
-            print(msg:format(k1, v1)) 
+   if print_secrets then
+      body_object = json.decode(body)
+      for k,v in pairs(body_object) do
+         if k == "data" then
+            for k1,v1 in pairs(v) do
+               local msg = "read secrets: %s : %s"
+               print(msg:format(k1, v1))
+            end
          end
       end
    end
-   ]]
 end
 
 function done(summary, latency, requests)
