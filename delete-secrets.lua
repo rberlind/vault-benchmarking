@@ -21,15 +21,19 @@ function init(args)
 end
 
 function request()
-   deletes = deletes + 1
    path = "/v1/secret/benchmark-" .. deletes
    body = ''
+   deletes = deletes + 1
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
 
 function response(status, headers, body)
    responses = responses + 1
+   if responses == 10000 then
+      -- wrk.thread:stop()
+      os.exit()
+   end
 end
 
 function done(summary, latency, requests)

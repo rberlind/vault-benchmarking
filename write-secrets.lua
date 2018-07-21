@@ -1,4 +1,4 @@
--- Script that writes and reads secrets from k/v engine in Vault
+-- Script that writes secrets to k/v engine in Vault
 
 local counter = 1
 local threads = {}
