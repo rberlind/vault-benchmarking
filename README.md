@@ -19,7 +19,7 @@ nohup wrk -t4 -c800 -d1h -H "X-Vault-Token: <vault_token>" -s write-secrets.lua 
 
 nohup wrk -t4 -c800 -d1h -H "X-Vault-Token: <vault_token>" -s read-secrets.lua http://<vault_url>:8200 > read-test-4-800-1hour.txt &
 
-wrk -t1 -c100 -d5m -H "X-Vault-Token: <vault_token>" -s delete-secrets.lua http://<vault_url>:8200
+wrk -t1 -c20 -d5m -H "X-Vault-Token: <vault_token>" -s delete-secrets.lua http://<vault_url>:8200
 
 ```
 
