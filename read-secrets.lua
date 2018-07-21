@@ -14,6 +14,8 @@ function init(args)
    reads = 0
    writes = 0
    responses = 0
+   -- give each thread different random seed
+   math.randomseed(os.time() + id*1000)
    method = "GET"
    local msg = "thread %d created"
    print(msg:format(id))
@@ -21,7 +23,10 @@ end
 
 function request()
    reads = reads + 1
-   path = "/v1/secret/benchmark-" .. (reads % 50) + 1
+   -- cycle through paths from 1 to N in order
+   -- path = "/v1/secret/benchmark-" .. (reads % 100) + 1
+   -- randomize path to secret
+   path = "/v1/secret/benchmark-" .. math.random(10000)
    body = ''
    requests = requests + 1
    return wrk.format(method, path, nil, body)
@@ -29,6 +34,17 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
+   --[[
+   body_object = json.decode(body)
+   for k,v in pairs(body_object) do 
+      if k == "data" then
+         for k1,v1 in pairs(v) do
+            local msg = "read secrets: %s : %s"
+            print(msg:format(k1, v1)) 
+         end
+      end
+   end
+   ]]
 end
 
 function done(summary, latency, requests)
