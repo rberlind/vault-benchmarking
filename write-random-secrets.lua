@@ -13,6 +13,8 @@ function init(args)
    requests  = 0
    writes = 0
    responses = 0
+   -- give each thread different random seed
+   math.randomseed(os.time() + id*1000)
    method = "POST"
    local msg = "thread %d created"
    print(msg:format(id))
@@ -20,8 +22,8 @@ end
 
 function request()
    writes = writes + 1
-   -- cycle through paths from 1 to N in order
-   path = "/v1/secret/read-test/secret-" .. writes
+   -- randomize path to secret
+   path = "/v1/secret/write-test-" .. math.random(1000)
    -- minimal secret giving thread id and # of write
    -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
    -- add extra key with 100 bytes
@@ -32,9 +34,6 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 1000 then
-      os.exit()
-   end
 end
 
 function done(summary, latency, requests)

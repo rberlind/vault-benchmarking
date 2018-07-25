@@ -1,4 +1,4 @@
--- Script that writes secrets to k/v engine in Vault
+-- Script that writes a list of secrets to k/v engine in Vault
 
 local counter = 1
 local threads = {}
@@ -21,18 +21,15 @@ end
 function request()
    writes = writes + 1
    -- cycle through paths from 1 to N in order
-   path = "/v1/secret/read-test/secret-" .. writes
-   -- minimal secret giving thread id and # of write
-   -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
-   -- add extra key with 100 bytes
-   body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
+   path = "/v1/secret/list-test/secret-" .. writes 
+   body = '{"key" : "1234567890"}'
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 1000 then
+   if responses == 100 then
       os.exit()
    end
 end

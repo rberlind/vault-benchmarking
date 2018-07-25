@@ -1,4 +1,4 @@
--- Script that writes and reads secrets from k/v engine in Vault
+-- Script that deletes secrets from k/v engine in Vault
 
 local counter = 1
 local threads = {}
@@ -11,8 +11,6 @@ end
 
 function init(args)
    requests  = 0
-   reads = 0
-   writes = 0
    deletes = 0
    responses = 0
    method = "DELETE"
@@ -21,8 +19,8 @@ function init(args)
 end
 
 function request()
-   path = "/v1/secret/benchmark-" .. deletes
-   body = ''
+   path = "/v1/secret/write-delete-test/thread-" .. id .. "-secret-" .. deletes 
+   body = ""
    deletes = deletes + 1
    requests = requests + 1
    return wrk.format(method, path, nil, body)
@@ -30,8 +28,7 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 10000 then
-      -- wrk.thread:stop()
+   if responses == 1000 then
       os.exit()
    end
 end
@@ -40,11 +37,9 @@ function done(summary, latency, requests)
    for index, thread in ipairs(threads) do
       local id        = thread:get("id")
       local requests  = thread:get("requests")
-      local reads     = thread:get("reads")
-      local writes    = thread:get("writes")
       local deletes   = thread:get("deletes")
       local responses = thread:get("responses")
-      local msg = "thread %d made %d requests including %d reads, %d writes, and % deletes, and got %d responses"
-      print(msg:format(id, requests, reads, writes, deletes, responses))
+      local msg = "thread %d made %d requests including % deletes and got %d responses"
+      print(msg:format(id, requests, deletes, responses))
    end
 end

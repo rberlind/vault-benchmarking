@@ -1,4 +1,4 @@
--- Script that reads secrets from k/v engine in Vault
+-- Script that lists secrets from k/v engine in Vault
 json = require "json"
 
 local counter = 1
@@ -13,20 +13,17 @@ end
 function init(args)
    print_secrets = args[1]
    requests  = 0
-   reads = 0
+   lists = 0
    responses = 0
-   -- give each thread different random seed
-   math.randomseed(os.time() + id*1000)
    method = "GET"
+   path = "/v1/secret/list-test?list=true"
+   body = ""
    local msg = "thread %d created with print_secrets set to %s"
    print(msg:format(id, print_secrets))
 end
 
 function request()
-   reads = reads + 1
-   -- randomize path to secret
-   path = "/v1/secret/read-test/secret-" .. math.random(1000)
-   body = ''
+   lists = lists + 1
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
@@ -37,22 +34,31 @@ function response(status, headers, body)
       body_object = json.decode(body)
       for k,v in pairs(body_object) do 
          if k == "data" then
+            local count = 0
             for k1,v1 in pairs(v) do
-               local msg = "read secrets: %s : %s"
-               print(msg:format(k1, v1)) 
+               for _, v2 in pairs(v1) do
+                  count = count + 1
+                  local msg = "response %d found secret: %s"
+                  print(msg:format(responses,v2)) 
+               end
+               local msg = "Found %d secrets in list"
+               print(msg:format(count))
             end
          end
       end
    end 
+   --[[if responses == 2 then
+      os.exit()
+   end]]
 end
 
 function done(summary, latency, requests)
    for index, thread in ipairs(threads) do
       local id        = thread:get("id")
       local requests  = thread:get("requests")
-      local reads     = thread:get("reads")
+      local lists     = thread:get("lists")
       local responses = thread:get("responses")
-      local msg = "thread %d made %d requests including %d reads and got %d responses"
-      print(msg:format(id, requests, reads, responses))
+      local msg = "thread %d made %d requests including %d lists and got %d responses"
+      print(msg:format(id, requests, lists, responses))
    end
 end
