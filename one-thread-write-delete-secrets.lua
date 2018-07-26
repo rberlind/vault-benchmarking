@@ -20,11 +20,12 @@ function init(args)
 end
 
 function request()
-   -- Note that first request is used for testing connection
-   -- It is not actually invoked
-   -- So, assume processing starts with second request
+   -- We assumse -t1 and -c2, meaning one thread and two connections
+   -- Note that first and third requests are used for testing connections
+   -- They are not actually invoked
+   -- So, we don't write first secret until request 4
    requests = requests + 1
-   if requests % 2 == 0 then
+   if requests > 3 and requests % 2 == 0 then
       -- Write secret
       writes = writes + 1
       method = "POST"
