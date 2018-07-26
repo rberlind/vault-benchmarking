@@ -1,5 +1,11 @@
 -- Script that writes and then deletes secrets in k/v engine in Vault
-
+-- This should use be used with -t1 -c2
+-- Additionally, add "-- <identifier>" after URL to pass ID so that multiple instances
+-- of the script can be run in parallel
+-- <identifier> should ideally be integers 1, 2, 3, ... with different identifier for each
+-- script run in parallel
+-- Note that the script might not delete final secret written if the last method invoked
+-- is a write
 local counter = 1
 local threads = {}
 
@@ -10,6 +16,7 @@ function setup(thread)
 end
 
 function init(args)
+   identifier = args[1]
    requests  = 0
    writes = 0
    deletes = 0
@@ -29,7 +36,7 @@ function request()
       -- Write secret
       writes = writes + 1
       method = "POST"
-      path = "/v1/secret/write-delete-test/secret-" .. writes % 1000
+      path = "/v1/secret/write-delete-test/test-" .. identifier .. "-secret-" .. writes % 1000
       body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
    else
       -- Delete secret
