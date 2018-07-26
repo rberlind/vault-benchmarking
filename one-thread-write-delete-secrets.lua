@@ -14,18 +14,21 @@ function init(args)
    writes = 0
    deletes = 0
    responses = 0
-   path = ''
+   path = "/v1/secret/write-delete-test/secret-0"
    local msg = "thread %d created"
    print(msg:format(id))
 end
 
 function request()
+   -- Note that first request is used for testing connection
+   -- It is not actually invoked
+   -- So, assume processing starts with second request
    requests = requests + 1
-   if requests % 2 == 1 then
+   if requests % 2 == 0 then
       -- Write secret
-      method = "POST"
-      path = "/v1/secret/write-delete-test/secret-" .. (writes % 1000)
       writes = writes + 1
+      method = "POST"
+      path = "/v1/secret/write-delete-test/secret-" .. writes % 1000
       body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
    else
       -- Delete secret
@@ -34,18 +37,9 @@ function request()
       -- Reuse last path, so don't set one
       body = ''
    end
-   -- local msg = "method is %s, path is: %s"
-   -- print(msg:format(method, path))
+   -- local msg = "request: %d: method is %s, path is: %s"
+   -- print(msg:format(requests, method, path))
    return wrk.format(method, path, nil, body)
-end
-
--- Delay even threads that do deletes at beginning
--- to give Vault time to save written secrets before deleting
--- Also add periodic smaller delays to keeps writes ahead of deletes
-function delay()
-  if requests % 2 == 0 then
-        return 0
-  end
 end
 
 function response(status, headers, body)
