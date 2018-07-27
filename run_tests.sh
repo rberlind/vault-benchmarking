@@ -11,34 +11,34 @@ nohup wrk -t4 -c16 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s read-secrets.lua htt
 nohup wrk -t1 -c2 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s list-secrets.lua http://<vault_url>:8200 > prod-test-list-100-secrets-t1-c2-6hours.log &
 
 # Run authentication test in background
-#nohup wrk -t1 -c8 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s authenticate.lua http://<vault_url>:8200 > prod-test-authenticate-t1-c8-6hours.log &
+nohup wrk -t1 -c8 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s authenticate.lua http://<vault_url>:8200 > prod-test-authenticate-t1-c8-6hours.log &
 
 # Run write/delete test in background
-nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 1 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test1.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 1 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test1.log &
 
 # Run write/delete test in background
-nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 2 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test2.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 2 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test2.log &
 
 # Run write/delete test in background
-nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 3 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test3.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 3 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test3.log &
 
 # Run write/delete test in background
-nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 4 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test4.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 4 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test4.log &
 
 # Run write/delete test in background
-nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 5 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test5.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 5 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test5.log &
 
 # Run write/delete test in background
-#nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 6 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test6.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 6 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test6.log &
 
 # Run write/delete test in background
-#nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 7 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test7.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 7 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test7.log &
 
 # Run write/delete test in background
-#nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 8 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test8.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 8 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test8.log &
 
 # Run write/delete test in background
-#nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 9 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test9.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 9 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test9.log &
 
 # Run write/delete test in background
-#nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s one-thread-write-delete-secrets.lua http://<vault_url>:8200 -- 10 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test10.log &
+nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 10 > prod-test-write-and-delete-1000-secrets-t1-c1-6hours-test10.log &
