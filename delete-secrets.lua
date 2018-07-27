@@ -1,5 +1,6 @@
 -- Script that deletes secrets from k/v engine in Vault
-
+-- Pass the path from which you want to delete secrets
+-- by adding "-- <path>" after the URL
 local counter = 1
 local threads = {}
 
@@ -10,11 +11,16 @@ function setup(thread)
 end
 
 function init(args)
+   if args[1] == nil then
+      path_prefix = "secret/test"
+   else
+      path_prefix = args[1]
+   end
    requests  = 0
    deletes = 0
    responses = 0
    method = "DELETE"
-   path = "/v1/secret/read-test/secret-0"
+   path = "/v1/" .. path_prefix .. "/secret-0"
    body = ''
    local msg = "thread %d created"
    print(msg:format(id))
@@ -26,7 +32,7 @@ function request()
    if requests > 0 then
       deletes = deletes + 1
       -- Set the path to the desired path with secrets you want to delete
-      path = "/v1/secret/read-test/secret-" .. deletes
+      path = "/v1/" .. path_prefix .. "/secret-" .. deletes
       body = ''
    end
    requests = requests + 1
@@ -35,9 +41,6 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 1001 then
-      os.exit()
-   end
 end
 
 function done(summary, latency, requests)
