@@ -19,12 +19,12 @@ Finally, [json.lua](./json.lua) is used by some of the other scripts to decode t
 ## Running the Scripts together
 The [run_tests.sh](./run_tests.sh) bash script runs the read-secrets.lua, list-secerts.lua, authenticate.lua, and 10 instances of the write-delete-secrets.lua script simultaneously. The number of instances of the last script can be changed to alter the mixture of reads, writes, and deletes. It can be run from multiple clients simultaneously as long as no instances of the write-delete-secrets.lua across these clients use the same identifier argument (\<n\>). Instances of any of the scripts can be commented out by prefacing them with a "#".
 
-In its default configuration, the run_tests script is designed to run a mixture of reads, lists, writes, deletes, and authentications consisting of about 84% reads, 5% lists, 5% writes, 5% deletes, and 1% authentications. Of course, these ratios will vary somewhat depending on your cluster's configuration even if you run the script without altering it.  Making changes to the tests run in the script including removing or adding tests or changing the thread and count parameters passed to them will obviously change the mixture as well as the total throughput of your combined test.
+In its default configuration, the run_tests.sh script is designed to run a mixture of reads, lists, writes, deletes, and authentications consisting of about 84% reads, 5% lists, 5% writes, 5% deletes, and 1% authentications. Of course, these ratios will vary somewhat depending on your cluster's configuration even if you run the script without altering it.  Making changes to the tests run in the script including removing or adding tests or changing the thread and count parameters passed to them will obviously change the mixture as well as the total throughput of your combined test.
 
 In general, you will want to edit the run_tests.sh script or create modified versions of it before running it so you can change the duration of the tests (with the `-d` parameter) and change the names of the log files.
 
 ## Setting up userpass Auth Method
-In order to run the authenticate-user.lua script, you need to set up the Vault [userpass](https://www.vaultproject.io/docs/auth/userpass.html) authentication method on your Vault cluster and add a user called loadtester with password benchmark.  Use these commands to do this:
+In order to run the authenticate-user.lua script, you need to set up the Vault [userpass](https://www.vaultproject.io/docs/auth/userpass.html) authentication method on your Vault cluster and add a user called "loadtester" with password "benchmark".  Use these commands to do this:
 
 ```
 vault auth enable userpass
@@ -33,12 +33,12 @@ vault write auth/userpass/users/loadtester password=benchmark policies=default
 
 ## Configuration of wrk Client Nodes
 
-To ensure adequate resources on the client nodes that run wrk, we suggest using a Linux node with 4 CPUs and 8 GB of RAM. You can run more than 1 node. While it is important to not exhaust the resources on your wrk clients, wrk is so efficient that this probably will not happen. Note that before following [wrk Linux installation instructions](https://github.com/wg/wrk/wiki/Installing-wrk-on-Linux) for Ubuntu, you should run `sudo apt-get update`.
+To ensure adequate resources on the client nodes that run wrk, we suggest using a Linux node with 4 CPUs and 8 GB of RAM. You can run more than 1 node. Before following the [wrk Linux installation instructions](https://github.com/wg/wrk/wiki/Installing-wrk-on-Linux) for Ubuntu, you should run `sudo apt-get update`.
 
 ## Examples of Running the Test Scripts
-See the [run_tests.sh](./run_tests.sh) script for examples of running most of the test scripts.  Note that you should export a Vault token with permission to read, list, write, and delete the secrets used by the tests to the VAULT_TOKEN environment variable with the command `export VAULT_TOKEN=<your_token>`.
+See the [run_tests.sh](./run_tests.sh) script for examples of running most of the test scripts.  You should export a Vault token with permissions to read, list, write, and delete the secrets used by the tests to the VAULT_TOKEN environment variable with the command `export VAULT_TOKEN=<your_token>`.
 
-The only test script not included in run_tests.sh is write-random-secrets.lua. That can be run with a command like:
+The only test script not included in run_tests.sh is write-random-secrets.lua. It can be run with a command like:
 ```
 nohup wrk -t4 -c16 -d1h -H "X-Vault-Token: $VAULT_TOKEN" -s write-random-secrets.lua http://<vault_url>:8200 > prod-test-write-1000-random-secrets-t4-c16-1hour.log &
 ```
@@ -47,7 +47,7 @@ We use "nohup" on the test scripts to ensure that the scripts continue to run if
 
 If you want the read-secrets.lua and list-secrets.lua scripts to print the secrets they retrieve, add `-- true` after the Vault URL.
 
-When running multiple instances of the write-delete-secrets.lua script simultaneously, be sure to add an extra argument `-- <n>` after the URL and to use a different value of \<n\> for each instance. Please also always run this script with one thread (`-t1`) and one connection (`-c1`) to ensure deletes do not reach the Vault server before the corresponding writes.
+When running multiple instances of the write-delete-secrets.lua script simultaneously, be sure to add the argument `-- <n>` after the URL and to use a different value of \<n\> for each instance. Please also always run this script with one thread (`-t1`) and one connection (`-c1`) to ensure deletes do not reach the Vault server before the corresponding writes.
 
 Descriptions of the wrk command line options are [here](https://github.com/wg/wrk#command-line-options).
 
@@ -69,4 +69,4 @@ wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s write-list.lua http://<vaul
 # Command to delete secrets (from secret/read-test)
 wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s delete-secrets.lua http://<vault_url>:8200 -- secret/read-test
 ```
-Note that you should specify the path from which you want to delete secrets when running the delete-secrets.lua script. The default value is "secret/test".
+Note that you should specify the path from which you want to delete secrets when running the delete-secrets.lua script by adding it after the URL. The default value is "secret/test".
