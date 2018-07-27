@@ -14,21 +14,28 @@ function init(args)
    deletes = 0
    responses = 0
    method = "DELETE"
+   path = "/v1/secret/read-test/secret-0"
+   body = ''
    local msg = "thread %d created"
    print(msg:format(id))
 end
 
 function request()
-   path = "/v1/secret/write-delete-test/thread-" .. id .. "-secret-" .. deletes 
-   body = ""
-   deletes = deletes + 1
+   -- First request is not actually invoked
+   -- So, don't process it in order to delete secret-1
+   if requests > 0 then
+      deletes = deletes + 1
+      -- Set the path to the desired path with secrets you want to delete
+      path = "/v1/secret/read-test/secret-" .. deletes
+      body = ''
+   end
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 1000 then
+   if responses == 1001 then
       os.exit()
    end
 end

@@ -13,9 +13,9 @@ function init(args)
    requests  = 0
    writes = 0
    responses = 0
+   method = "POST"
    -- give each thread different random seed
    math.randomseed(os.time() + id*1000)
-   method = "POST"
    local msg = "thread %d created"
    print(msg:format(id))
 end
@@ -23,7 +23,7 @@ end
 function request()
    writes = writes + 1
    -- randomize path to secret
-   path = "/v1/secret/write-test-" .. math.random(1000)
+   path = "/v1/secret/write-random-test-" .. math.random(1000)
    -- minimal secret giving thread id and # of write
    -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
    -- add extra key with 100 bytes

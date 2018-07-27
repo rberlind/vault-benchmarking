@@ -14,25 +14,31 @@ function init(args)
    writes = 0
    responses = 0
    method = "POST"
+   path = "/v1/secret/read-test/secret-0"
+   body = ''
    local msg = "thread %d created"
    print(msg:format(id))
 end
 
 function request()
-   writes = writes + 1
-   -- cycle through paths from 1 to N in order
-   path = "/v1/secret/read-test/secret-" .. writes
-   -- minimal secret giving thread id and # of write
-   -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
-   -- add extra key with 100 bytes
-   body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
+   -- First request is not actually invoked
+   -- So, don't process it in order to get secret-1 as first secret
+   if requests > 0 then
+      writes = writes + 1
+      -- cycle through paths from 1 to N in order
+      path = "/v1/secret/read-test/secret-" .. writes
+      -- minimal secret giving thread id and # of write
+      -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
+      -- add extra key with 100 bytes
+      body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
+   end
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 1000 then
+   if responses == 1001 then
       os.exit()
    end
 end

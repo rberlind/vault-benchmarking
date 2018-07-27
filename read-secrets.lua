@@ -15,9 +15,10 @@ function init(args)
    requests  = 0
    reads = 0
    responses = 0
+   method = "GET"
+   body = ''
    -- give each thread different random seed
    math.randomseed(os.time() + id*1000)
-   method = "GET"
    local msg = "thread %d created with print_secrets set to %s"
    print(msg:format(id, print_secrets))
 end
@@ -26,7 +27,6 @@ function request()
    reads = reads + 1
    -- randomize path to secret
    path = "/v1/secret/read-test/secret-" .. math.random(1000)
-   body = ''
    requests = requests + 1
    return wrk.format(method, path, nil, body)
 end

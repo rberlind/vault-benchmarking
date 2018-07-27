@@ -47,9 +47,6 @@ function response(status, headers, body)
          end
       end
    end 
-   --[[if responses == 2 then
-      os.exit()
-   end]]
 end
 
 function done(summary, latency, requests)

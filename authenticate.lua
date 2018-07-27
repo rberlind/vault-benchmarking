@@ -1,4 +1,4 @@
--- Script that writes a list of secrets to k/v engine in Vault
+-- Script that authenticates a user against Vault's userpass system many times
 
 local counter = 1
 local threads = {}
@@ -11,41 +11,38 @@ end
 
 function init(args)
    requests  = 0
-   writes = 0
+   authentications = 0
    responses = 0
    method = "POST"
-   path = "/v1/secret/list-test/secret-0"
-   body = '{"key" : "1234567890"}'
+   path = "/v1/auth/userpass/login/loadtester"
+   body = '{"password" : "benchmark" }'
    local msg = "thread %d created"
    print(msg:format(id))
 end
 
 function request()
-   -- First request is not actually invoked
-   -- So, don't process it in order to get secret-1 as first secret
-   if requests > 0 then
-      writes = writes + 1
-      -- cycle through paths from 1 to N in order
-      path = "/v1/secret/list-test/secret-" .. writes
-   end
    requests = requests + 1
+   authentications = authentications + 1
    return wrk.format(method, path, nil, body)
+end
+
+function delay()
+   return 5
 end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 100 then
-      os.exit()
-   end
+   -- print("Status: " .. status)
 end
 
 function done(summary, latency, requests)
    for index, thread in ipairs(threads) do
       local id        = thread:get("id")
       local requests  = thread:get("requests")
-      local writes    = thread:get("writes")
+      local authentications    = thread:get("authentications")
       local responses = thread:get("responses")
-      local msg = "thread %d made %d requests including %d writes and got %d responses"
-      print(msg:format(id, requests, writes, responses))
+      local msg = "thread %d made %d authentications and got %d responses"
+      print(msg:format(id, authentications, responses))
    end
 end
+
