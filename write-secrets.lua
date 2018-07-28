@@ -1,4 +1,5 @@
 -- Script that writes secrets to k/v engine in Vault
+-- Indicate number of secrets to write to secret/read-test path with "-- <N>"
 
 local counter = 1
 local threads = {}
@@ -10,6 +11,12 @@ function setup(thread)
 end
 
 function init(args)
+   if args[1] == nil then
+      num_secrets = 100
+   else
+      num_secrets = tonumber(args[1])
+   end
+   print("Number of secrets is: " .. num_secrets)
    requests  = 0
    writes = 0
    responses = 0
@@ -25,7 +32,7 @@ function request()
    -- So, don't process it in order to get secret-1 as first secret
    if requests > 0 then
       writes = writes + 1
-      -- cycle through paths from 1 to N in order
+      -- cycle through paths from 1 to num_secrets in order
       path = "/v1/secret/read-test/secret-" .. writes
       -- minimal secret giving thread id and # of write
       -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
@@ -38,7 +45,7 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
-   if responses == 1001 then
+   if responses == num_secrets then
       os.exit()
    end
 end
