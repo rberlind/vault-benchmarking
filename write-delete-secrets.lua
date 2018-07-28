@@ -4,7 +4,7 @@
 -- of the script can be run in parallel
 -- <identifier> should ideally be integers 1, 2, 3, ... with different identifier for each
 -- script run in parallel
--- Also, to specify the number of distinct secrets to write and delete, add a second argument.
+-- Also, to specify the number of distinct secrets to write and delete for each instance, add a second argument.
 -- Together, you would add "-- <identifier> <num_secrets>
 -- Note that the script might not delete final secret written if the last method invoked
 -- is a write
@@ -24,7 +24,7 @@ function init(args)
       identifier = args[1]
    end
    if args[2] == nil then
-      num_secrets = 1000
+      num_secrets = 100
    else
       num_secrets = tonumber(args[2])
    end
