@@ -1,4 +1,6 @@
 -- Script that lists secrets from k/v engine in Vault
+-- If you want to print the secrets found for each list, add "-- true" after the URL
+
 json = require "json"
 
 local counter = 1
@@ -11,6 +13,11 @@ function setup(thread)
 end
 
 function init(args)
+   if args[1] == nil then
+      print_secrets = "false"
+   else
+      print_secrets = args[1]
+   end
    print_secrets = args[1]
    requests  = 0
    lists = 0
@@ -30,7 +37,7 @@ end
 
 function response(status, headers, body)
    responses = responses + 1
-   if print_secrets then
+   if print_secrets == "true" then
       body_object = json.decode(body)
       for k,v in pairs(body_object) do 
          if k == "data" then

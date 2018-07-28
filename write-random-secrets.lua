@@ -1,4 +1,5 @@
 -- Script that writes secrets to k/v engine in Vault
+-- You can specify the number of distinct secrets to write by adding "-- <N>" after the URL
 
 local counter = 1
 local threads = {}
@@ -10,6 +11,12 @@ function setup(thread)
 end
 
 function init(args)
+   if args[1] == nil then
+      num_secrets = 1000
+   else
+      num_secrets = tonumber(args[1])
+   end
+   print("Number of secrets is: " .. num_secrets)
    requests  = 0
    writes = 0
    responses = 0
@@ -23,7 +30,7 @@ end
 function request()
    writes = writes + 1
    -- randomize path to secret
-   path = "/v1/secret/write-random-test-" .. math.random(1000)
+   path = "/v1/secret/write-random-test-" .. math.random(num_secrets)
    -- minimal secret giving thread id and # of write
    -- body = '{"foo-' .. id .. '" : "bar-' .. writes ..'"}'
    -- add extra key with 100 bytes

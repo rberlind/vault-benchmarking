@@ -3,10 +3,10 @@ This repository contains some Lua scripts for running benchmarks against Vault w
 
 ## Scripts
 The following are the main test scripts:
-1. [read-secrets.lua](./read-secrets.lua): This script randomly reads secrets from a set of N secrets under the path secret/read-test. It can also print the secrets if you add "-- true" after the URL. The default value of N is 1,000. Use the write-secrets.lua script to populate the secrets read by this script before running it and check that you write all secrets you expect to read. The script reads them randomly over and over until it finishes.
-1. [write-random-secrets.lua](./write-random-secrets.lua): This script randomly writes secrets to a set of N secrets under the path secret/write-random-test. The default vaue of N is 1,000. By default, each secret has one key with 10-20 bytes and a second key with 100 bytes.  The number and size of the keys can be changed. The script writes them randomly over and over until it finishes. There is no need to pre-populate Vault with any data for this test.
-1. [write-delete-secrets.lua](./write-delete-secrets.lua): This script sequentially writes and deletes secrets. It must be run with one thread (`-t1`) and one connection (`-c1`) to ensure deletes do not reach the Vault server before the corresponding writes. However, multiple instances of this script can be run at the same time by passing an extra argument `-- <n>` after the URL, being sure to use a different value of \<n\> for each instance. Secrets for instance \<n\> of the script will be written in a sequential loop to the secret/write-delete-test path and will be named "test\<n\>-secret-\<x\>" where \<x\> is between 1 and N (default 1,000). This naming convention allows multiple instances of this script as well as other scripts to be run at the same time without conflict. By default, each secret has one key with 10-20 bytes and a second key with 100 bytes.  The number and size of the keys can be changed.  There is no need to pre-populate Vault with any data for this test. The last secret written might not be deleted if the final request is a write.  
-1. [list-secrets.lua](./list-secerts.lua): This script repeatedly lists all secrets on the path secret/list-test. Use the write-list.lua script to populate that path with secrets. By default, that script writes 100 secrets to that path with each secret having one key with 10 bytes.
+1. [read-secrets.lua](./read-secrets.lua): This script randomly reads secrets from a set of N secrets under the path secret/read-test. The default value of N is 1,000. To change this, add "-- <\N\>" after the URL where \<N\> is the number of secrets you want to use. It can also print the secrets if you add "-- \<N\> true" after the URL. Use the write-secrets.lua script to populate the secrets read by this script before running it and check that you write all secrets you expect to read. The script reads them randomly over and over until it finishes.  
+1. [write-random-secrets.lua](./write-random-secrets.lua): This script randomly writes secrets to a set of N secrets under the path secret/write-random-test. The default vaue of N is 1,000. By default, each secret has one key with 10-20 bytes and a second key with 100 bytes.  To change the number of distinct secrets written, add "-- <\N\>" after the URL where \<N\> is the number of secrets you want to use. The number and size of the keys could be changed, but you would need to edit the script. The script writes them randomly over and over until it finishes. There is no need to pre-populate Vault with any data for this test.
+1. [write-delete-secrets.lua](./write-delete-secrets.lua): This script sequentially writes and deletes secrets. It must be run with one thread (`-t1`) and one connection (`-c1`) to ensure deletes do not reach the Vault server before the corresponding writes. However, multiple instances of this script can be run at the same time by passing an extra argument `-- <n>` after the URL, being sure to use a different value of \<n\> for each instance. Secrets for instance \<n\> of the script will be written in a sequential loop to the secret/write-delete-test path and will be named "test\<n\>-secret-\<x\>" where \<x\> is between 1 and N (default 1,000). This naming convention allows multiple instances of this script as well as other scripts to be run at the same time without conflict. By default, each secret has one key with 10-20 bytes and a second key with 100 bytes.  The number of distinct secrets, N, can be changed by adding an extra argument after the script identifier. In this case, you would add "-- \<identifier\> \<N\>" after the URL, using integers for both of these arguments. The number and size of the keys could be changed, but you would need to edit the script.  There is no need to pre-populate Vault with any data for this test. The last secret written might not be deleted if the final request is a write.  
+1. [list-secrets.lua](./list-secerts.lua): This script repeatedly lists all secrets on the path secret/list-test. Use the write-list.lua script to populate that path with secrets. By default, that script writes 100 secrets to that path with each secret having one key with 10 bytes. If you want to print the secrets found in each list, add "-- true" after the URL.
 1. [authenticate.lua](.authenticate.lua): This script repeatedly authenticates a user ("loadtester") against Vault's [userpass](https://www.vaultproject.io/docs/auth/userpass.html) authentication method. (See below for instructions to enable it.)
 
 We also have the following utility scripts used to populate or delete secrets used by the test scripts:
@@ -38,9 +38,9 @@ To ensure adequate resources on the client nodes that run wrk, we suggest using 
 ## Examples of Running the Test Scripts
 See the [run_tests.sh](./run_tests.sh) script for examples of running most of the test scripts.  You should export a Vault token with permissions to read, list, write, and delete the secrets used by the tests to the VAULT_TOKEN environment variable with the command `export VAULT_TOKEN=<your_token>`.
 
-The only test script not included in run_tests.sh is write-random-secrets.lua. It can be run with a command like:
+The only test script not included in run_tests.sh is write-random-secrets.lua. It could be run and configured to write to 10,000 secrets with a command like:
 ```
-nohup wrk -t4 -c16 -d1h -H "X-Vault-Token: $VAULT_TOKEN" -s write-random-secrets.lua http://<vault_url>:8200 > prod-test-write-1000-random-secrets-t4-c16-1hour.log &
+nohup wrk -t4 -c16 -d1h -H "X-Vault-Token: $VAULT_TOKEN" -s write-random-secrets.lua http://<vault_url>:8200 -- 10000 > prod-test-write-1000-random-secrets-t4-c16-1hour.log &
 ```
 
 We use "nohup" on the test scripts to ensure that the scripts continue to run if our ssh session to the node running the wrk client gets disconnected and output the results to files with the names of the files indicating the parameters used and how long they ran for.
@@ -60,11 +60,11 @@ Notes on the parameters:
 Here are example of running the utility scripts to populate and delete secrets needed by the test scripts:
 
 ```
-# Command to write secrets needed by the read-secrets.lua script:
-wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s write-secrets.lua http://<vault_url>:8200
+# Command to write 10,000 secrets needed by the read-secrets.lua script:
+wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s write-secrets.lua http://<vault_url>:8200 -- 1000
 
 # Command to write secrets needed by the list-secrets.lua script:
-wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s write-list.lua http://<vault_url>:8200
+wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s write-list.lua http://<vault_url>:8200 -- 100
 
 # Command to delete secrets (from secret/read-test)
 wrk -t1 -c1 -d1m -H "X-Vault-Token: $VAULT_TOKEN" -s delete-secrets.lua http://<vault_url>:8200 -- secret/read-test
