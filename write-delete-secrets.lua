@@ -4,6 +4,8 @@
 -- of the script can be run in parallel
 -- <identifier> should ideally be integers 1, 2, 3, ... with different identifier for each
 -- script run in parallel
+-- Also, to specify the number of distinct secrets to write and delete, add a second argument.
+-- Together, you would add "-- <identifier> <num_secrets>
 -- Note that the script might not delete final secret written if the last method invoked
 -- is a write
 local counter = 1
@@ -21,6 +23,12 @@ function init(args)
    else
       identifier = args[1]
    end
+   if args[2] == nil then
+      num_secrets = 1000
+   else
+      num_secrets = tonumber(args[2])
+   end
+   print("Number of secrets is: " .. num_secrets)
    requests  = 0
    writes = 0
    deletes = 0
@@ -39,7 +47,7 @@ function request()
    if requests > 3 and requests % 2 == 0 then
       -- Write secret
       method = "POST"
-      path = "/v1/secret/write-delete-test/test" .. identifier .. "-secret-" .. (writes % 1000) + 1
+      path = "/v1/secret/write-delete-test/test" .. identifier .. "-secret-" .. (writes % num_secrets) + 1
       body = '{"thread-' .. id .. '" : "write-' .. writes ..'","extra" : "1xxxxxxxxx2xxxxxxxxx3xxxxxxxxx4xxxxxxxxx5xxxxxxxxx6xxxxxxxxx7xxxxxxxxx8xxxxxxxxx9xxxxxxxxx0xxxxxxxxx"}'
       writes = writes + 1
    else

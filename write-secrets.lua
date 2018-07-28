@@ -12,7 +12,7 @@ end
 
 function init(args)
    if args[1] == nil then
-      num_secrets = 100
+      num_secrets = 1000
    else
       num_secrets = tonumber(args[1])
    end
