@@ -10,8 +10,8 @@ nohup wrk -t4 -c16 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s read-secrets.lua htt
 # You can use write-secrets.lua (after some modification) to populate them
 nohup wrk -t1 -c2 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s list-secrets.lua http://<vault_url>:8200 -- false > prod-test-list-100-secrets-t1-c2-6hours.log &
 
-# Run authentication test in background
-nohup wrk -t1 -c8 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s authenticate.lua http://<vault_url>:8200 > prod-test-authenticate-t1-c8-6hours.log &
+# Run authentication/revocation test in background
+nohup wrk -t1 -c16 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s authenticate-and-revoke.lua http://<vault_url>:8200 > prod-test-authenticate-revoke-t1-c16-6hours.log &
 
 # Run write/delete test in background
 nohup wrk -t1 -c1 -d6h -H "X-Vault-Token: $VAULT_TOKEN" -s write-delete-secrets.lua http://<vault_url>:8200 -- 1 100 > prod-test-write-and-delete-100-secrets-t1-c1-6hours-test1.log &
